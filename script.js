@@ -410,7 +410,7 @@ need a global variable for that 😉)
 Test data: Images in the img folder. Test the error handler by passing a wrong
 image path. Set the network speed to “Fast 3G” in the dev tools Network tab,
 otherwise images load too fast
-*/
+
 
 const wait = function (seconds) {
   return new Promise(function (resolve) {
@@ -457,3 +457,34 @@ createImage('img/img-1.jpg')
     currentImg.style.display = 'none';
   })
   .catch(err => console.error(err));
+*/
+
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(
+      position => resolve(position),
+      err => reject(err)
+    );
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+const whereAmI = async function () {
+  // gEOLOCATION
+  const pos = await getPosition();
+
+  const { latitude: lat, longitude: lng } = pos.coords;
+
+  // Reverse geocoding
+  const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+  const dataGeo = await resGeo.json();
+  console.log(dataGeo);
+
+  // Country data
+  const res = await fetch(`https://restcountries.com/v2/name/${dataGeo.country}`);
+  const data = await res.json();
+  console.log(data);
+  renderCountry(data[0]);
+};
+whereAmI();
+console.log('First');
